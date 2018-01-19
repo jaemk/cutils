@@ -423,7 +423,9 @@ size_t hashmap_cap(HashMap* hashmap);
 void hashmap_resize();
 
 /* Insert a key, value pair, replacing any existing matching key.
- * The data behind both the `key` and `value` pointers will be bitwise copied.
+ * The `__drop_key` and `__drop_item` will be applied to both existing `key` and `value`
+ * objects before the data behind the new `key` and `value` pointers
+ * bitwise copied into place.
  */
 void hashmap_insert(HashMap* hashmap, void* key, void* value);
 

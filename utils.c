@@ -726,8 +726,9 @@ void hashmap_insert_with_hash(HashMap* map, void* key, void* value, size_t hash)
     for (size_t i = 0; i < bucket_len; i++) {
         HashMapKV* kv_ref = vec_index_ref(bucket, i);
         if (map->__cmp(key, kv_ref->key) == 0) {
-            map->__drop_key(key);
+            map->__drop_key(kv_ref->key);
             map->__drop_item(kv_ref->value);
+            memcpy(kv_ref->key, key, map->__key_size);
             memcpy(kv_ref->value, value, map->__item_size);
             return;
         }
