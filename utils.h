@@ -113,8 +113,14 @@ typedef struct {
 } HashMapIter;
 
 
-
+/* -------------------------- */
+/* ----- Misc functions ----- */
+/* -------------------------- */
+/* No-op function */
 void utils_noop();
+
+/* Apply the fnv-1 64bit hash function to an arbitrary set of bytes */
+uint64_t fnv_64(void* ptr, size_t num_bytes);
 
 
 /* -------------------------- */
@@ -386,11 +392,8 @@ void vec_drop(void* vec_ptr);
 
 
 /* -------------------------- */
-/* ----- Hash functions ----- */
+/* --- HashMap functions ---- */
 /* -------------------------- */
-/* Apply the fnv-1 64bit hash function to an arbitrary set of bytes */
-uint64_t fnv_64(void* ptr, size_t num_bytes);
-
 /* Construct a new HashMap with zero capacity */
 HashMap hashmap_new(size_t key_size, size_t item_size, hashFn hash_func, cmpEq cmp_func, mapFn drop_key, mapFn drop_item);
 
@@ -415,10 +418,7 @@ size_t hashmap_len(HashMap* hashmap);
 size_t hashmap_cap(HashMap* hashmap);
 
 /* Resize the given `HashMap` with the new capacity.
- * The new capacity is expected to be greater than the current.
- * If the new capacity is smaller, trailing data will be dropped
- * which may result in leaked memory if dropped elements are/hold
- * pointers that need to be cleaned up.
+ * The new capacity must be greater than the current.
  */
 void hashmap_resize();
 

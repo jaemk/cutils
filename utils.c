@@ -6,6 +6,8 @@
 #include "utils.h"
 
 
+/* ----------- Misc ------------- */
+
 /* Increase capacity by a factor of 2, unless it's already really big,
  * then increase by a constant value
  */
