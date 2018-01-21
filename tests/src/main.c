@@ -402,6 +402,23 @@ void test_vec_copy() {
     vec_drop_with(&v, string_drop);
 }
 
+void test_slices() {
+    printf("| --- Slice contents (vec/slice of String):\n");
+    Vec v = vec_with_capacity(sizeof(String), 4);
+    const char* in_strings[] = {"one", "two", "three", "four"};
+    for (size_t i = 0; i < 4; i++) {
+        String s_ = string_copy_from_cstr(in_strings[i]);
+        vec_push(&v, &s_);
+    }
+    Slice s1 = vec_as_slice(&v);
+    void* offset_ptr = (void*)vec_index_ref_unchecked(&v, 1);
+    Slice s2 = slice_from_ptr_len(sizeof(String), offset_ptr, 3);
+    String* a = (String*)slice_index_ref(&s1, 1);
+    String* b = (String*)slice_index_ref(&s2, 0);
+    ASSERT("slice offset content eq", uint8_t, string_eq(a, b), ==, 0, "expected: %d, got: %d\n");
+    vec_drop_with(&v, string_drop);
+}
+
 void vec_tests() {
     printf("\nVec tests:\n");
     test_new_vec_mutate();
@@ -412,6 +429,7 @@ void vec_tests() {
     test_vec_insert();
     test_vec_remove();
     test_vec_copy();
+    test_slices();
 }
 
 

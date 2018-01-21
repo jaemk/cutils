@@ -19,6 +19,16 @@ size_t __inc_cap(size_t current) {
     }
 }
 
+uint64_t fnv_64(void* ptr, size_t num_bytes) {
+    size_t FNV_PRIME = 1099511628211U;
+    size_t FNV_OFFSET = 14695981039346656037U;
+    size_t hash = FNV_OFFSET;
+    for (size_t i = 0; i < num_bytes; i++) {
+        hash = hash ^ *((char*)ptr + i);
+        hash = hash * FNV_PRIME;
+    }
+    return hash;
+}
 
 void utils_noop() { return; }
 
@@ -602,17 +612,68 @@ void vec_drop_with(Vec* v, mapFn drop) {
     v->__cap = 0;
 }
 
-
-uint64_t fnv_64(void* ptr, size_t num_bytes) {
-    size_t FNV_PRIME = 1099511628211U;
-    size_t FNV_OFFSET = 14695981039346656037U;
-    size_t hash = FNV_OFFSET;
-    for (size_t i = 0; i < num_bytes; i++) {
-        hash = hash ^ *((char*)ptr + i);
-        hash = hash * FNV_PRIME;
-    }
-    return hash;
+Slice vec_as_slice(Vec* v) {
+    Slice sl = {
+        .__data=v->__data,
+        .__item_size=v->__item_size,
+        .__len=v->__len,
+    };
+    return sl;
 }
+
+SliceIter vec_iter(Vec* v) {
+    SliceIter iter = {
+        .__data=v->__data,
+        .__item_size=v->__item_size,
+        .__len=v->__len,
+        .__ind=0,
+    };
+    return iter;
+}
+
+
+/* ----------- Slice ------------- */
+
+void* slice_index_ref(Slice* sl, size_t ind) {
+    if (ind >= sl->__len) {
+        fprintf(stderr, "Out of bounds: len: %lu, index: %lu\n", sl->__len, ind);
+        abort();
+    }
+    return slice_index_ref_unchecked(sl, ind);
+}
+
+inline void* slice_index_ref_unchecked(Slice* sl, size_t ind) {
+    char* offset = (char*)sl->__data + (ind * sl->__item_size);
+    return (void*)offset;
+}
+
+Slice slice_from_ptr_len(size_t item_size, const void* ptr, size_t len) {
+    Slice sl = { .__data=ptr, .__item_size=item_size, .__len=len };
+    return sl;
+}
+
+SliceIter slice_iter(Slice* sl) {
+    SliceIter iter = {
+        .__data=(void*)sl->__data,
+        .__item_size=sl->__item_size,
+        .__len=sl->__len,
+        .__ind=0,
+    };
+    return iter;
+}
+
+uint8_t slice_iter_done(SliceIter* iter) {
+    return iter->__ind < iter->__len ? 1 : 0;
+}
+
+void* slice_iter_next(SliceIter* iter) {
+    char* ref = (char*)iter->__data + iter->__item_size * iter->__ind;
+    iter->__ind++;
+    return (void*)ref;
+}
+
+
+/* ----------- HashMap ------------- */
 
 HashMap hashmap_new(size_t key_size, size_t item_size, hashFn hash_func, cmpEq cmp_func, mapFn drop_key, mapFn drop_item) {
     HashMap map = {

@@ -37,9 +37,18 @@ typedef struct {
  * Borrowed array of generic data with `__item_size`
  */
 typedef struct {
-    void* __data;
+    const void* __data;
     size_t __item_size, __len;
 } Slice;
+
+
+/* SliceIter
+ * Iterator over references into a Slice.
+ */
+typedef struct {
+    void* __data;
+    size_t __item_size, __len, __ind;
+} SliceIter;
 
 
 /* Function used to modify elements in a container
@@ -392,6 +401,36 @@ void vec_drop_with(Vec* v, mapFn drop);
  * up before being cleared out, e.g. a vec of pointers.
  */
 void vec_drop(void* vec_ptr);
+
+/* Convert a `Vec` into a `Slice` */
+Slice vec_as_slice(Vec* v);
+
+/* Construct a `SliceIter` over element of a `Vec` */
+SliceIter vec_iter(Vec* v);
+
+
+/* -------------------------- */
+/* --- Slice functions ---- */
+/* -------------------------- */
+/* Return a reference into a `Slice` at a given index */
+void* slice_index_ref(Slice* v, size_t ind);
+
+/* Same as `slice_index_ref` except there's no bounds check */
+void* slice_index_ref_unchecked(Slice* v, size_t ind);
+
+/* Construct a new `Slice` from raw parts */
+Slice slice_from_ptr_len(size_t item_size, const void* ptr, size_t len);
+
+/* Construct a `SliceIter` over element of a `Slice` */
+SliceIter slice_iter(Slice* sl);
+
+/* Check if the current `SliceIter` is complete.
+ * Returning 1 for complete, and 0 for incomplete.
+ */
+uint8_t slice_iter_done(SliceIter* iter);
+
+/* Return a pointer to the next value reference. */
+void* slice_iter_next(SliceIter* iter);
 
 
 /* -------------------------- */
