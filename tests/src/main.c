@@ -398,8 +398,8 @@ void test_vec_copy() {
     ASSERT("string inner-data pointers are equal",
             uintptr_t, (uintptr_t)orig_ref->__data, ==, (uintptr_t)copy_ref->__data, "expected: %lu, got: %lu");
     /* Only need to drop strings from one vec since we copied the inner __data pointers */
-    vec_drop_with(&v, string_drop);
     vec_drop(&copy);
+    vec_drop_with(&v, string_drop);
 }
 
 void vec_tests() {
