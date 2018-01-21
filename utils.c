@@ -535,6 +535,11 @@ void* vec_index_ref(Vec* v, size_t ind) {
     return (void*)offset;
 }
 
+inline void* vec_index_ref_unchecked(Vec* v, size_t ind) {
+    char* offset = (char*)v->__data + (ind * v->__item_size);
+    return (void*)offset;
+}
+
 void vec_iter_ref(Vec* v, mapFn func) {
     size_t len = vec_len(v);
     for (size_t i = 0; i < len; i++) {
@@ -786,8 +791,8 @@ uint8_t hashmap_iter_done(HashMapIter* iter) {
 }
 
 HashMapKV* hashmap_iter_next(HashMapIter* iter) {
-    Vec* bucket = vec_index_ref(&iter->__map->__buckets, iter->__bucket_ind);
-    HashMapKV* kv_ref = vec_index_ref(bucket, iter->__bucket_inner_ind);
+    Vec* bucket = vec_index_ref_unchecked(&iter->__map->__buckets, iter->__bucket_ind);
+    HashMapKV* kv_ref = vec_index_ref_unchecked(bucket, iter->__bucket_inner_ind);
     iter->__count++;
     iter->__bucket_inner_ind++;
     size_t bucket_len = vec_len(bucket);

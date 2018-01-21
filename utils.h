@@ -363,6 +363,9 @@ void vec_remove_with(Vec* v, size_t index, mapFn drop);
  */
 void* vec_index_ref(Vec* v, size_t ind);
 
+/* Same as `vec_index_ref` except there's no bounds check */
+void* vec_index_ref_unchecked(Vec* v, size_t ind);
+
 /* Apply the `func` function to each element in the `Vec`.
  */
 void vec_iter_ref(Vec* v, mapFn func);
